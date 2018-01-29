@@ -37,5 +37,6 @@ State.user.keys = []
 
 - [ ] Throw callbacks on `delete` calls
 - [ ] Parse strings like `'user.keys[0].name'` instead of requiring an array of arguments 🤮
+- [ ] Be able to throw initial callbacks to get listeners up to speed
 - [ ] Document
 - [ ] Tests
