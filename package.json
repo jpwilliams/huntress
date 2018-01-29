@@ -1,0 +1,12 @@
+{
+  "name": "huntress",
+  "version": "0.0.0",
+  "description": "Observable objects that allow you to watch any nested property. Perfect for state stores.",
+  "main": "index.js",
+  "repository": "https://github.com/jpwilliams/huntress",
+  "author": "Jack Williams",
+  "license": "MIT",
+  "dependencies": {
+    "deep-object-diff": "^1.0.4"
+  }
+}
