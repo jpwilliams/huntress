@@ -5,32 +5,34 @@ A mad method of observing deep object properties and getting callbacks for when 
 ``` js
 import { Watcher as State } from 'huntress'
 
-State.track(['user', 'username'], (username) => {
+// start tracking changes to a user's username
+State.track('user.username', (username) => {
   console.log('Username is:', username)
 })
 
 State.user = {name: 'Joe Bloggs'}
-// ...
 State.user.username = 'joe'
-// Username is: joe
+// LOG -- Username is: joe
+
 State.user = {name: 'David', username: 'daveyjones'}
-// Username is: daveyjones
+// LOG -- Username is: daveyjones
+
+// -----
 
 // even works with arrays
-State.track(['user', 'keys', 1, 'name'], (keyName) => {
+State.track('user.keys[1].name', (keyName) => {
   console.log('Second key name is:', keyName)
 })
 
 State.user.keys = [{name: 'foo'}]
-// ...
 State.user.keys.push({name: 'bar'})
-// Second key name is: bar
+// LOG -- Second key name is: bar
+
 State.user.keys.push({name: 'baz'})
-// ...
 State.user.keys = [{name: 'wham'}, {name: 'bam'}]
-// Second key name is: bam
+// LOG -- Second key name is: bam
 State.user.keys = []
-// Second key name is: undefined
+// LOG -- Second key name is: undefined
 ```
 
 ### Todo
