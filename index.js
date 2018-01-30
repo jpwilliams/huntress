@@ -2,13 +2,11 @@ const { EagerEmitter } = require('./lib/EagerEmitter')
 const { RecursiveProxy } = require('./lib/RecursiveProxy')
 
 exports.createWatcher = function createWatcher (state = {}) {
-  const tracker = track.bind(null, emitter)
-  const untracker = untrack.bind(null, emitter)
   const emitter = new EagerEmitter()
 
   return RecursiveProxy(emitter, {
-    track: tracker,
-    untrack: untracker
+    track: track.bind(null, emitter),
+    stopTracking: stopTracking.bind(null, emitter)
   }, [], state)
 }
 
@@ -18,8 +16,8 @@ function track (emitter, bits, callback) {
   emitter.on(genPath(bits), callback)
 }
 
-function untrack (emitter, bits, fn) {
-  emitter.removeListener(genPath(bits), fn)
+function stopTracking (emitter, bits, fn) {
+  emitter[fn ? 'removeListener' : 'removeAllListeners'](genPath(bits), fn)
 }
 
 function genPath (bits) {
