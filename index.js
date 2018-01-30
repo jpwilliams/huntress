@@ -1,10 +1,10 @@
-const { EventEmitter } = require('events')
+const { EagerEmitter } = require('./lib/EagerEmitter')
 const { RecursiveProxy } = require('./lib/RecursiveProxy')
 
 exports.createWatcher = function createWatcher (state = {}) {
-  const emitter = new EventEmitter()
   const tracker = track.bind(null, emitter)
   const untracker = untrack.bind(null, emitter)
+  const emitter = new EagerEmitter()
 
   return RecursiveProxy(emitter, {
     track: tracker,
