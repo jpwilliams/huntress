@@ -15,9 +15,15 @@ exports.createWatcher = function createWatcher (state = {}) {
 exports.Watcher = exports.createWatcher()
 
 function track (emitter, bits, callback) {
-  emitter.on(bits.join('.'), callback)
+  emitter.on(genPath(bits), callback)
 }
 
 function untrack (emitter, bits, fn) {
-  emitter.removeListener(bits.join('.'), fn)
+  emitter.removeListener(genPath(bits), fn)
+}
+
+function genPath (bits) {
+  return Array.isArray(bits)
+      ? bits.join('.')
+      : bits.replace(/\[(.+?)\]/g, '.$1')
 }
