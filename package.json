@@ -2,12 +2,33 @@
   "name": "huntress",
   "version": "0.2.0",
   "description": "Observable objects that allow you to watch any nested property. Perfect for state stores.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": "https://github.com/jpwilliams/huntress",
   "author": "Jack Williams",
   "license": "MIT",
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "prepublishOnly": "yarn run build"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": 6
+          }
+        }
+      ]
+    ]
+  },
   "dependencies": {
     "deep-object-diff": "^1.0.4",
     "react": "^16.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1"
   }
 }
