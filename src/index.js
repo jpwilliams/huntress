@@ -1,6 +1,6 @@
 const { Component, createElement } = require('react')
-const { EagerEmitter } = require('./lib/EagerEmitter')
-const { RecursiveProxy } = require('./lib/RecursiveProxy')
+const { EagerEmitter } = require('./EagerEmitter')
+const { RecursiveProxy } = require('./RecursiveProxy')
 
 exports.createWatcher = function createWatcher (state = {}) {
   const emitter = new EagerEmitter()
