@@ -1,7 +1,31 @@
 const { diff } = require('deep-object-diff')
+let emitMap = {}
+let emitQueued = false
+
+function queueEmit (key, ...values) {
+  emitMap[key] = [key, ...values]
+}
+
+function tryPerformEmits (emitter, group) {
+  if (!group) return performEmits(emitter)
+  if (emitQueued) return
+  emitQueued = true
+
+  process.nextTick(() => performEmits(emitter))
+}
+
+function performEmits (emitter) {
+  Object.values(emitMap).forEach((args) => {
+    emitter.emit(...args)
+  })
+
+  emitMap = {}
+  emitQueued = false
+}
 
 exports.RecursiveProxy = function RecursiveProxy (
   emitter,
+  group,
   reserved,
   path = [],
   target,
@@ -19,10 +43,12 @@ exports.RecursiveProxy = function RecursiveProxy (
       ) {
         return RecursiveProxy(
           emitter,
+          group,
           reserved,
           path.concat(key),
           target[key],
-          stages.concat([target[key]])
+          stages.concat([target[key]]),
+
         )
       }
 
@@ -59,15 +85,18 @@ exports.RecursiveProxy = function RecursiveProxy (
       const builtPath = finalKey.reduce((builtPath, bit, i) => {
         const stage = (i === lastIndex) ? target[key] : stages[i]
         builtPath += (builtPath ? '.' : '') + bit
-        emitter.emit(builtPath, stage)
+        queueEmit(builtPath, stage)
 
         return builtPath
       }, '')
 
       if (value && typeof value === 'object') {
         d = d || diff(oldVal, target[key])
-        loopEmit(emitter, builtPath, d)
+        const emissions = loopEmit(emitter, builtPath, d)
+        emissions.forEach(args => queueEmit(...args))
       }
+
+      tryPerformEmits(emitter, group)
 
       return true
     },
@@ -84,18 +113,22 @@ exports.RecursiveProxy = function RecursiveProxy (
 
       const finalKey = path.concat(key)
       const lastIndex = finalKey.length - 1
+      const toEmit = []
 
       const builtPath = finalKey.reduce((builtPath, bit, i) => {
         const stage = (i === lastIndex) ? target[key] : stages[i]
         builtPath += (builtPath ? '.' : '') + bit
-        emitter.emit(builtPath, stage)
+        queueEmit(builtPath, stage)
 
         return builtPath
       }, '')
 
       if (oldVal && typeof oldVal === 'object') {
-        loopEmit(emitter, builtPath, oldVal, true)
+        const emissions = loopEmit(emitter, builtPath, oldVal, true)
+        emissions.forEach(args => queueEmit(...args))
       }
+
+      tryPerformEmits(emitter, group)
 
       return true
     }
@@ -107,15 +140,19 @@ exports.RecursiveProxy = function RecursiveProxy (
 function loopEmit (emitter, path, obj, isRemoval, set) {
   set = set || new Set()
   set.add(obj)
+
+  const toEmit = []
   const keys = Object.keys(obj)
 
   keys.forEach((key) => {
     const v = obj[key]
     const newPath = path + (path ? '.' : '') + key
-    emitter.emit(newPath, isRemoval ? undefined : v)
+    toEmit.push([newPath, isRemoval ? undefined : v])
 
     if (v && typeof v === 'object' && !set.has(v)) {
-      loopEmit(emitter, newPath, v, isRemoval, set)
+      toEmit.push(...loopEmit(emitter, newPath, v, isRemoval, set))
     }
   })
+
+  return toEmit
 }
