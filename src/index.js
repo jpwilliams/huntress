@@ -2,16 +2,18 @@ const { Component, createElement } = require('react')
 const { EagerEmitter } = require('./EagerEmitter')
 const { RecursiveProxy } = require('./RecursiveProxy')
 
-exports.createWatcher = function createWatcher (state = {}) {
+exports.createWatcher = function createWatcher (state = {}, options = {}) {
   const emitter = new EagerEmitter()
 
-  return RecursiveProxy(emitter, {
+  return RecursiveProxy(emitter, Boolean(options.group), {
     track: track.bind(null, emitter),
     stopTracking: stopTracking.bind(null, emitter)
   }, [], state)
 }
 
-exports.Watcher = exports.createWatcher()
+exports.Watcher = exports.createWatcher({}, {
+  group: true
+})
 
 exports.withWatcher = (paths, watcher) => {
   const w = watcher || exports.Watcher
