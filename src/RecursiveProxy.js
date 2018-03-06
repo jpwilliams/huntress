@@ -138,8 +138,12 @@ exports.RecursiveProxy = function RecursiveProxy (
 }
 
 function loopEmit (emitter, path, obj, isRemoval, set) {
-  set = set || new Set()
-  set.add(obj)
+  Object.defineProperty(obj, '__tainted__', {
+    enumerable: false,
+    writable: false,
+    value: true,
+    configurable: true
+  })
 
   const toEmit = []
   const keys = Object.keys(obj)
@@ -149,10 +153,12 @@ function loopEmit (emitter, path, obj, isRemoval, set) {
     const newPath = path + (path ? '.' : '') + key
     toEmit.push([newPath, isRemoval ? undefined : v])
 
-    if (v && typeof v === 'object' && !set.has(v)) {
+    if (v && typeof v === 'object' && !v.hasOwnProperty('__tainted__')) {
       toEmit.push(...loopEmit(emitter, newPath, v, isRemoval, set))
     }
   })
+
+  delete obj.__tainted__
 
   return toEmit
 }
