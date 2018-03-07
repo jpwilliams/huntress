@@ -14,7 +14,6 @@
     "presets": ["env", "stage-0"]
   },
   "dependencies": {
-    "deep-object-diff": "^1.0.4",
     "react": "^16.2.0"
   },
   "devDependencies": {
