@@ -1,4 +1,4 @@
-const { diff } = require('deep-object-diff')
+const { diff } = require('./diff')
 let emitMap = {}
 let emitQueued = false
 
