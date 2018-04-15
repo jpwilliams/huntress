@@ -1,6 +1,6 @@
 {
   "name": "huntress",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Observable objects that allow you to watch any nested property. Perfect for state stores.",
   "main": "lib/index.js",
   "repository": "https://github.com/jpwilliams/huntress",
