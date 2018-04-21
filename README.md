@@ -7,6 +7,9 @@ yarn add huntress
 ```
 
 ``` js
+// ---
+// WelcomeMessage Component
+// ---
 import { withWatcher} from 'huntress'
 
 const Welcome = ({ name }) => (
@@ -16,6 +19,20 @@ const Welcome = ({ name }) => (
 export default withWatcher({
   name: 'user.profile.displayName'
 })(Welcome)
+
+// ---
+// Somewhere else
+// ---
+import { Watcher } from 'huntress'
+
+Watcher.user = {
+  profile: {
+    avatar: '...',
+    username: 'jpwilliams',
+    displayName: 'Jack Williams',
+    dob: '--/--/--'
+  }
+}
 ```
 
 The store itself is changed by just mutating.
