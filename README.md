@@ -7,7 +7,6 @@ yarn add huntress
 ```
 
 ``` js
-import { Component } from 'react'
 import { withWatcher} from 'huntress'
 
 const Welcome = ({ name }) => (
