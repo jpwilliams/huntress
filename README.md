@@ -1,44 +1,45 @@
 # huntress
 
-A mad method of observing deep object properties and getting callbacks for when they change. Awesome for simple state management.
+Huntress is a very simple state store with an HOC for React which helps you watch deep properties.
 
-``` js
-import { Watcher as State } from 'huntress'
-
-// start tracking changes to a user's username
-State.track('user.username', (username) => {
-  console.log('Username is:', username)
-})
-
-State.user = {name: 'Joe Bloggs'}
-State.user.username = 'joe'
-// LOG -- Username is: joe
-
-State.user = {name: 'David', username: 'daveyjones'}
-// LOG -- Username is: daveyjones
-
-// -----
-
-// even works with arrays
-State.track('user.keys[1].name', (keyName) => {
-  console.log('Second key name is:', keyName)
-})
-
-State.user.keys = [{name: 'foo'}]
-State.user.keys.push({name: 'bar'})
-// LOG -- Second key name is: bar
-
-State.user.keys.push({name: 'baz'})
-State.user.keys = [{name: 'wham'}, {name: 'bam'}]
-// LOG -- Second key name is: bam
-State.user.keys = []
-// LOG -- Second key name is: undefined
+``` sh
+yarn add huntress
 ```
 
-### Todo
+``` js
+import { Component } from 'react'
+import { withWatcher} from 'huntress'
 
-- [x] Throw callbacks on `delete` calls
-- [x] Parse strings like `'user.keys[0].name'` instead of requiring an array of arguments 🤮
-- [x] Be able to throw initial callbacks to get listeners up to speed
-- [ ] Document
-- [ ] Tests
+const Welcome = ({ name }) => (
+  <div>Hi{name ? `, ${name}` : ''}!</div>
+)
+
+export default withWatcher({
+  name: 'user.profile.displayName'
+})(Welcome)
+```
+
+The store itself is changed by just mutating.
+
+Huntress will decide on exactly what changed and only send updates to the relevant listeners.
+
+``` js
+import { Watcher } from 'huntress'
+
+Watcher.user = myUserObj
+Watcher.user.keys[1].headers = { foo: 'bar' }
+```
+
+While use with React is its target, Huntress also exposes its tracking API.
+
+``` js
+// function track(path: string, callback: function): void
+Watcher.track('user.profile.names[0]', (firstName) => {
+  console.log(`The user's first name changed to "${firstName}".`)
+})
+
+// function stopTracking(path: string, fn?: function): void
+Watcher.stopTracking('user.profile.displayName')
+```
+
+Try it out. It's fun.
